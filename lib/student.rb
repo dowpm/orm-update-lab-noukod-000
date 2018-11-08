@@ -4,9 +4,7 @@ class Student
   attr_accessor :name, :grade, :id
 
   def initialize(id=nil, name, grade)
-      @id = id
-      @name = name
-      @grade = grade
+      @id, @name, @grade = id, name, grade
   end
 
   def self.create_table
@@ -46,10 +44,19 @@ class Student
     student.save
   end
 
-  def self.new_from_db(row)
+  def self.new_from_db row
     new(*row)
   end
 
+  def self.find_by_name name
+    sql = <<-SQL
+      SELECT * FROM students
+      WHERE name = ?
+    SQL
 
+    DB[:conn].execute(sql,name).map do |row|
+      new_from_db(row)
+    end.first
+  end
 
 end
